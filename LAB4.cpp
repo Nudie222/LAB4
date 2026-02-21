@@ -62,7 +62,6 @@ GLuint create_shader_program(const char* vertex_path, const char* fragment_path)
     return program;
 }
 
-// Глобальные переменные
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -164,7 +163,6 @@ int main() {
     GLuint shader_program = create_shader_program("vertex_shader.glsl", "fragment_shader.glsl");
     if (shader_program == 0) return -1;
 
-    // Шестиугольник
     float vertices[] = {
          0.5f,  0.0f, 0.0f,
          0.25f, 0.433f, 0.0f,
@@ -193,7 +191,7 @@ int main() {
 
     glEnable(GL_DEPTH_TEST);
 
-    // === НОВОЕ: переменные для deltaTime ===
+
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
 
@@ -201,7 +199,7 @@ int main() {
     float aspectRatio = (float)windowWidth / (float)windowHeight;
 
     while (!glfwWindowShouldClose(window)) {
-        // === НОВОЕ: вычисляем deltaTime ===
+  
         float currentFrame = (float)glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -228,9 +226,9 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glUseProgram(shader_program);
 
-        // === ИСПРАВЛЕНО: движение с deltaTime ===
+       
         glm::vec3 newPos = cameraPos;
-        const float cameraSpeed = 2.0f; // единиц в секунду (подберите под свой вкус)
+        const float cameraSpeed = 2.0f; 
 
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
             newPos += cameraSpeed * deltaTime * cameraFront;
@@ -241,23 +239,21 @@ int main() {
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
             newPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * deltaTime;
 
-        // Ограничения площади
+  
         if (newPos.x > -areaLimit && newPos.x < areaLimit &&
             newPos.y > -areaLimit && newPos.y < areaLimit &&
             newPos.z > -areaLimit && newPos.z < areaLimit) {
             cameraPos = newPos;
         }
 
-        // Обновление aspect ratio
         aspectRatio = (float)windowWidth / (float)windowHeight;
 
-        // Матрицы
+
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
         glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-        // Uniform матриц
         GLint projLoc = glGetUniformLocation(shader_program, "projection");
         GLint viewLoc = glGetUniformLocation(shader_program, "view");
         GLint modelLoc = glGetUniformLocation(shader_program, "model");
@@ -265,7 +261,6 @@ int main() {
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-        // Цвет от времени
         float timeValue = (float)glfwGetTime();
         float red = sin(timeValue) * 0.5f + 0.5f;
         float green = sin(timeValue * 1.5f) * 0.5f + 0.5f;
